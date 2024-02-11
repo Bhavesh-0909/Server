@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema(
     {
@@ -50,5 +51,19 @@ const userSchema = new mongoose.Schema(
         }
     },
     {timestamps:true});
+
+userSchema.pre('save', async function(next){
+    this.password = await bcrypt.hash(this.password, process.env.HASHING_ROUND);
+
+    this.profile ={
+        gender:null, dob:null, bioData:null, profession:null
+    }
+    this.avatar = `https://api.dicebear.com/5.x/initials/svg?seed=${this.firstname} ${this.lastName}`;
+    next();
+});
+
+userSchema.method.isPasswordCorrect = async function(password){
+    return await bcrypt.compare(password, this.password)
+}
 
 module.exports = mongoose.model("User", userSchema);

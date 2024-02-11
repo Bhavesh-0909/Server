@@ -1,11 +1,10 @@
 const User = require('../model/user.model');
-const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
 const Otp = require('../model/otp.model')
 const {ApiError} = require('../utils/ApiError.utils');
 const {ApiResponse} = require('../utils/ApiResponse.utils');
 require('dotenv').config();
-const Profile = require('../model/profile.model');
+const jwt = require('jsonwebtoken')
 
 //*****Send Verification******* 
 exports.sendVerificationController = async(req, res) => {
@@ -68,16 +67,9 @@ exports.signupController = async(req, res) =>{
             throw new ApiError(400, "User Already extist")
         }
 
-        const hashPassword = await bcrypt(password, process.env.HASHING_ROUND);
-
-        const profile = await Profile.create({
-            gender:null, dob:null, bioData:null, profession:null
-        });
-
         const user = await User.create({
             firstName, lastName, email,
-            password:hashPassword, contactNo, accountType, 
-            avatar:`https://api.dicebear.com/5.x/initials/svg?seed=${firstname} ${lastName}`
+            password, contactNo, accountType,
         })
 
         return res.status(200).json(
@@ -92,8 +84,43 @@ exports.signupController = async(req, res) =>{
 //*********Login*********
 exports.loginController = async(req, res) =>{
     try {
-        
+        const {email, password} = req.body;
+
+        if(!email || !password){
+            throw new ApiError(400, "Fill all the feilds");
+        }
+
+        const user = await User.findOne({email});
+        if(!user){
+            throw new ApiError(400, "User does not exits");
+        }
+
+        const isPasswordValid = user.isPasswordCorrect(password)
+        if(!isPasswordValid){
+            throw new ApiError(400, "Incorrect Password");
+        }
+
+        const playload = {
+            email:user.password,
+            id:user._id,
+            accountType:user.accountType
+        }
+
+        const token = jwt.sign(playload, process.env.JWT_SECRET, {expiresIn:'2h'})
+
+        user.token = token;
+        user.password = undefined;
+
+        const options = {
+            expiresIn: new Date(Date.now() + 3*24*60*60*1000),
+            httpOnly:true
+        };
+
+        res.cookie("token", token, options).status(200).json(
+            new ApiResponse(200, "user Logined", {token, user})
+        )
+
     } catch (error) {
-        
+        throw new ApiError(500, error.message, error)
     }
 }
