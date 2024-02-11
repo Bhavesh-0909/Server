@@ -43,7 +43,11 @@ const userSchema = new mongoose.Schema(
         courseProgress:[{
             type: mongoose.Schema.Types.ObjectId,
             ref:"Courseprogress"
-        }]
+        }],
+        avatar:{
+            type:String,
+            required:true
+        }
     },
     {timestamps:true});
 

@@ -3,7 +3,9 @@ const bcrypt = require('bcrypt');
 const otpGenerator = require('otp-generator');
 const Otp = require('../model/otp.model')
 const {ApiError} = require('../utils/ApiError.utils');
-const {ApiResponse} = require('../utils/ApiResponse.utils')
+const {ApiResponse} = require('../utils/ApiResponse.utils');
+require('dotenv').config();
+const Profile = require('../model/profile.model');
 
 //*****Send Verification******* 
 exports.sendVerificationController = async(req, res) => {
@@ -35,7 +37,7 @@ exports.sendVerificationController = async(req, res) => {
     
 
     } catch (error) {
-        throw new ApiError(500, "Error while otp generation")
+        throw new ApiError(500, error.message, error)
     }
 }
 
@@ -50,13 +52,6 @@ exports.signupController = async(req, res) =>{
             throw new ApiError(400, "Fill all the feilds for Sign Up")
         }
 
-        if(password !== confirmPassword ) throw new ApiError(400, "Password not Matching");
-
-        const extingUser = await User.findOne({email});
-        if(extingUser){
-            throw new ApiError(400, "User Already extist")
-        }
-
         const recentOtp = await Otp.find({email}).sort({createdAt:-1}).limit(1);
         if(!recentOtp){
             throw new ApiError(400, "Otp Expired")
@@ -64,10 +59,33 @@ exports.signupController = async(req, res) =>{
             throw new ApiError(400, "Otp did not Match")
         }
 
-        
+        if(password !== confirmPassword ){
+            throw new ApiError(400, "Password not Matching");
+        }
 
-    } catch (error) {
+        const extingUser = await User.findOne({email});
+        if(extingUser){
+            throw new ApiError(400, "User Already extist")
+        }
+
+        const hashPassword = await bcrypt(password, process.env.HASHING_ROUND);
+
+        const profile = await Profile.create({
+            gender:null, dob:null, bioData:null, profession:null
+        });
+
+        const user = await User.create({
+            firstName, lastName, email,
+            password:hashPassword, contactNo, accountType, 
+            avatar:`https://api.dicebear.com/5.x/initials/svg?seed=${firstname} ${lastName}`
+        })
+
+        return res.status(200).json(
+            new ApiResponse(200, "User Signup completed", user)
+        )
         
+    } catch (error) {
+        throw new ApiError(500, error.message, error)
     }
 }
 
