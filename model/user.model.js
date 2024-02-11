@@ -58,7 +58,7 @@ userSchema.pre('save', async function(next){
     this.profile ={
         gender:null, dob:null, bioData:null, profession:null
     }
-    this.avatar = `https://api.dicebear.com/5.x/initials/svg?seed=${this.firstname} ${this.lastName}`;
+    this.avatar = `https://api.dicebear.com/5.x/initials/svg?seed=${this.firstname} ${this.lastName}&radius=50`;
     next();
 });
 
