@@ -5,7 +5,8 @@ const {ApiError} = require('../utils/ApiError.utils');
 const {ApiResponse} = require('../utils/ApiResponse.utils');
 require('dotenv').config();
 const jwt = require('jsonwebtoken')
-
+const bcrypt = require('bcrypt');
+const mailsender = require('../utils/nodemailer.utils')
 //*****Send Verification******* 
 exports.sendVerificationController = async(req, res) => {
     try {
@@ -123,4 +124,50 @@ exports.loginController = async(req, res) =>{
     } catch (error) {
         throw new ApiError(500, error.message, error)
     }
+}
+
+//*********Change Password********
+
+exports.changePasswordController = async(req, res) => {
+    try {
+        const {currentPassword, newPassword, confirmPassword} = req.body;
+        const {email} = req.cookie.email;
+        if(!currentPassword || !newPassword || !confirmPassword){
+            throw new ApiError(400, "Fill all the fields");
+        }else if(!email){
+            throw new ApiError(400, "Please Login to change password")
+        }
+
+        if(newPassword !== confirmPassword){
+            throw new ApiError(400, "Password not matching");
+        }
+
+        const user = await User.findOne({email});
+        if(!user){
+            throw new ApiError(400, "User not Found");
+        }
+
+        const isPasswordValid = await User.isPasswordCorrect(currentPassword);
+        if(!isPasswordValid){
+            throw new ApiError(400, "Wrong Password");
+        }
+
+        const hashpassword = await bcrypt.sign(newPassword, process.env.HASHING_ROUND);
+
+        user.password = hashpassword
+
+        const savePassword = await user.save();
+
+        await mailsender(email, "Password changed Successfully", "password changed");
+
+        return res.status(200).json(
+            new ApiResponse(200, "Password Changed")
+        )
+
+    } catch (error) {
+        throw new ApiError(500, error.message, error)
+    }
+    
+
+
 }
