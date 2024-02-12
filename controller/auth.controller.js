@@ -152,9 +152,9 @@ exports.changePasswordController = async(req, res) => {
             throw new ApiError(400, "Wrong Password");
         }
 
-        const hashpassword = await bcrypt.sign(newPassword, process.env.HASHING_ROUND);
+        const hashpassword = bcrypt.hash(newPassword, process.env.HASHING_ROUND);
 
-        user.password = hashpassword
+        user.password = hashpassword;
 
         const savePassword = await user.save();
 

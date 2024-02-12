@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema(
             required:true,
             enum:["Admin","Student","Instructor"]
         },
+        token:{
+            type:String,
+        },
+        resetPasswordExp:{
+            type:Date,
+        },
         courses:[{
             type:mongoose.Schema.Types.ObjectId,
             ref:"Courses"
