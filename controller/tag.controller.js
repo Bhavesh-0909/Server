@@ -1,5 +1,4 @@
 const Tag = require('../model/tag.model')
-const Course = require('../model/course.model');
 const { ApiError } = require('../utils/ApiError.utils');
 const {ApiResponse} = require('../utils/ApiResponse.utils');
 
@@ -30,7 +29,7 @@ exports.createTag = async(req, res) =>{
 //**********get all courses of a tag********
 exports.getAllcoursesOfTag = async(req, res) =>{
     try {
-        
+
         const {tag} = req.body;
         if(!tag){
             throw new ApiError(400, "Send the Tag");
