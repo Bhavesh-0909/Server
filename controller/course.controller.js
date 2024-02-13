@@ -36,7 +36,15 @@ exports.createCourse = async(req, res) => {
         )
 
     } catch (error) {
-        throw new ApiError(500, "Failed to create Course")
+        throw new ApiError(500, error.message, error)
     }
 }
+
 //*******get all courses********
+exports.getAllCourse = async(req, res) =>{
+    try {
+        
+    } catch (error) {
+        throw new ApiError(500, error.message, error)
+    }
+}

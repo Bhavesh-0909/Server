@@ -16,13 +16,13 @@ exports.createTag = async(req, res) =>{
 
         await Tag.create({title, description});
 
-        res.status(200).json(
+        return res.status(200).json(
             new ApiResponse(200, "Tag created Successfully")
         )
 
 
     } catch (error) {
-        throw new ApiError(500, "Failed to created to Tag")
+        throw new ApiError(500, error.message, error)
     }
 }
 
@@ -35,13 +35,13 @@ exports.getAllcoursesOfTag = async(req, res) =>{
             throw new ApiError(400, "Send the Tag");
         }
 
-        const allCourses = await Tag.find(tag).populate('courses').exec();
+        const allCourses = await Tag.find({title:tag}).populate('courses').exec();
 
         res.status(200).json(
             new ApiResponse(200, "All the courses of the tag", allCourses)
         )
 
     } catch (error) {
-        throw new ApiError(500, "Failed to created to Tag")
+        throw new ApiError(500, error.message, error)
     }
 }
