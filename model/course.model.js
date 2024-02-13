@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const courseSchema = new mongoose.Schema({
-    title:{
+    courseName:{
         type:String,
         required:true
     },
-    description:{
+    courseDesc:{
         type:String,
         required:true
     },
@@ -35,7 +35,7 @@ const courseSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"Review"
     }],
-    tags:{
+    tag:{
         type: mongoose.Schema.Types.ObjectId,
         ref:"Tag"
     },
