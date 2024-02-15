@@ -1,5 +1,5 @@
 const Course = require('../model/course.model');
-const Tag = require('../model/tag.model');
+const Category = require('../model/category.model');
 const { ApiError } = require('../utils/ApiError.utils');
 const {ApiResponse} = require('../utils/ApiResponse.utils')
 const uploadImageOnCloudinary = require('../utils/uploadImageOnCloudinary.utils');
@@ -7,11 +7,11 @@ const uploadImageOnCloudinary = require('../utils/uploadImageOnCloudinary.utils'
 //*******create A course********
 exports.createCourse = async(req, res) => {
     try {
-        const {courseName, courseDesc, price, whatWillYouLearn, tag} = req.body;
+        const {courseName, courseDesc, price, whatWillYouLearn, category} = req.body;
         const thumbnail = req.files.thumbnail;
         const insturctorID = req.user._id;
 
-        if(!courseName || !courseDesc || !price || !whatWillYouLearn || !tag || !thumbnail){
+        if(!courseName || !courseDesc || !price || !whatWillYouLearn || !category || !thumbnail){
             throw new ApiError(400, "Fill all the fileds")
         }
         if(!insturctorID){
@@ -24,15 +24,15 @@ exports.createCourse = async(req, res) => {
         }
 
         const courseDetail = await Course.create({
-            courseName, courseDesc, price, whatWillYouLearn, tag,
+            courseName, courseDesc, price, whatWillYouLearn, category,
             insturctor:insturctorID, thumbnail:thumbnailURL.secure_url
         },{new:true})
 
-        await Tag.findOneAndUpdate({title:tag},
+        await Category.findOneAndUpdate({title:category},
             {$push:{courses:courseDetail._id}})
 
         return res.status(200).json(
-            new ApiResponse(200, "course created", courseDetail)
+            new ApiResponse(200, "course created", courseDetail._id)
         )
 
     } catch (error) {
