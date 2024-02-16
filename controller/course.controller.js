@@ -2,7 +2,7 @@ const Course = require('../model/course.model');
 const Category = require('../model/category.model');
 const { ApiError } = require('../utils/ApiError.utils');
 const {ApiResponse} = require('../utils/ApiResponse.utils')
-const uploadImageOnCloudinary = require('../utils/uploadImageOnCloudinary.utils');
+const uploadFileOnCloudinary = require('../utils/uploadFileOnCloudinary.utils');
 
 //*******create A course********
 exports.createCourse = async(req, res) => {
@@ -18,7 +18,7 @@ exports.createCourse = async(req, res) => {
             throw new ApiError(400, "please Login");
         }
 
-        const thumbnailURL = await uploadImageOnCloudinary(thumbnail, process.env.FOLDER_NAME);
+        const thumbnailURL = await uploadFileOnCloudinary(thumbnail, "Thumbnail");
         if(!thumbnailURL){
             throw new ApiError(400, "failed to upload file ");
         }

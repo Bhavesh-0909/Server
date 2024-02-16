@@ -2,7 +2,7 @@ const { ApiError } = require('./ApiError.utils');
 
 const cloudinary = require('cloudinary').v2;
 
-const uploadImageOnCloudinary = async(file, folder, height, quality) => {
+const uploadFileOnCloudinary = async(file, folder, height, quality) => {
     try {
         if(!file || !folder){
             throw new ApiError(400, "file not recived");
@@ -27,4 +27,4 @@ const uploadImageOnCloudinary = async(file, folder, height, quality) => {
     }
 }
 
-module.exports = uploadImageOnCloudinary;
+module.exports = uploadFileOnCloudinary;
