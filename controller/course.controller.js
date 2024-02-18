@@ -43,7 +43,14 @@ exports.createCourse = async(req, res) => {
 //*******get all courses********
 exports.getAllCourse = async(req, res) =>{
     try {
-        
+        const data = await Course.find();
+        if(!data){
+            throw new ApiError(400, "Data not found")
+        }
+
+        return res.status(200).json(
+            new ApiResponse(200, "all courses", data)
+        )
     } catch (error) {
         throw new ApiError(500, error.message, error)
     }
