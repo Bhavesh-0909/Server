@@ -12,7 +12,7 @@ const profileSchema = new mongoose.Schema({
         type:String,
     },
     dob:{
-        type:String
+        type:Date
     }
 });
 
