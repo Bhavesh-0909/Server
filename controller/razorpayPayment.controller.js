@@ -90,6 +90,12 @@ exports.verifySignature = async (req, res) => {
             throw new ApiError(400, "course not found");
         }
 
+        await mailsender(userResponse.email, "Enrolled", "kkkkkkkk")
+
+        return res.status(200).json(
+            new ApiResponse(200, "Payment successfull");
+        )
+
     } catch (error) {
         throw new ApiError(500, error.message, error)
     }
